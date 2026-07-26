@@ -11,7 +11,10 @@
 
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 func equal(x, y map[string]int) bool {
 	if len(x) != len(y) {
@@ -28,12 +31,31 @@ func equal(x, y map[string]int) bool {
 
 func main() {
 
-	a := map[string]int{"A": 0}
-	b := map[string]int{"A": 0}
-	c := map[string]int{"B": 0}
+	counts := make(map[string]int)
 
-	fmt.Println(equal(a, b))
-	fmt.Println(equal(a, c))
+	for _, word := range strings.Fields("go is simple and go is fase") {
+		counts[word]++
+	}
+
+	fmt.Println(counts["go"])
+	fmt.Println(counts["is"])
+
+	// seen := make(map[string]bool)
+
+	// for _, value := range []string{"go", "rust", "go", "java"} {
+	// 	if !seen[value] { //เคยเจอ go rust  แล้วยัง ถ้ายังทำต่อ
+	// 		seen[value] = true
+	// 		fmt.Println(seen[value])
+	// 		fmt.Println(value)
+	// 	}
+	// }
+
+	// a := map[string]int{"A": 0}
+	// b := map[string]int{"A": 0}
+	// c := map[string]int{"B": 0}
+
+	// fmt.Println(equal(a, b))
+	// fmt.Println(equal(a, c))
 
 	// ages := map[string]int{"bob": 25}
 	// _ = &ages["bob"]

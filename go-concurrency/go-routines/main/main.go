@@ -2,79 +2,66 @@ package main
 
 import (
 	"fmt"
-	"sync"
 	"time"
 )
 
-var (
-	mu      sync.Mutex
-	balance int = 1000
-	wg      sync.WaitGroup
-)
-
 func main() {
+	workerCout := 10
 
-	// doneCh := make(chan bool, 3)
+	// 1. Use channel to receive data from go routine
+	//    Send data from go routine back to main
 
-	// go UpdateBalance(doneCh, 100)
-	// go UpdateBalance(doneCh, 500)
-	// go UpdateBalance(doneCh, 400)
+	responseChanel := make(chan string)
 
-	// <-doneCh
-	// <-doneCh
-	// <-doneCh
-
-	jobCh := make(chan int, 10)
-	resultCh := make(chan int, 10)
-
-	for i := range 10 {
-		jobCh <- i + 1
+	for i := 0; i < workerCout; i++ {
+		workerID := fmt.Sprintf("worker-%d", i)
+		go worker1(workerID, responseChanel)
 	}
 
-	close(jobCh)
-
-	for range 3 {
-		wg.Add(1)
-		// go double(jobCh, resultCh)
-		go func() {
-			defer wg.Done() // คนงานรายงานตัวตอนเลิกงาน
-			double(jobCh, resultCh)
-		}()
+	for i := 0; i < workerCout; i++ {
+		res := <-responseChanel
+		println(res)
 	}
 
-	go func() { // ← เงาเฝ้าประตูอีกหนึ่งร่าง
-		wg.Wait()       // หลับรอจนคนงานครบ 3
-		close(resultCh) // ครบแล้ว → ปิดท่อ
-	}()
+	close(responseChanel)
+	println("All response returned")
 
-	for result := range resultCh { // range ได้เลย ไม่ต้องนับ 10 เอง!
-		fmt.Println(result)
+	// 2. Use channel to signal go module to exit
+	//    Send data from outside go model into module
+
+	exitChanel := make(chan bool)
+	for i := 0; i < workerCout; i++ {
+		workerID := fmt.Sprintf("worker-%d", i)
+		go worker3(workerID, exitChanel)
 	}
 
-	// for range 10 {
-	// 	result := <-resultCh
-	// 	fmt.Println(result)
-	// }
-
+	time.Sleep(10 * time.Second)
+	for i := 0; i < workerCout; i++ {
+		exitChanel <- true
+	}
+	close(exitChanel)
+	time.Sleep(2 * time.Second)
+	println("Main is exited")
 }
 
-// func UpdateBalance(doneCh chan<- bool, amount int) {
+func worker3(workerID string, exitChanel chan bool) {
+	i := 0
+	for true {
+		i++
 
-// 	mu.Lock()
-// 	defer mu.Unlock()
-// 	time.Sleep(1 * time.Second)
-// 	fmt.Println("update balance")
+		select {
+		case <-exitChanel:
+			println(fmt.Sprintf("workerID=%s has exited", workerID))
+			return
+		default:
+			println(fmt.Sprintf("Worker=%s, Counter=%d", workerID, i))
+			time.Sleep(1 * time.Second)
+		}
 
-// 	balance -= amount
-// 	doneCh <- true
-
-// 	fmt.Println("Balance Update")
-
-// }
-
-func double(jobCh <-chan int, resultCh chan<- int) {
-	for j := range jobCh {
-		time.Sleep(1 * time.Second)
-		resultCh <- j * 2
 	}
+}
+
+func worker1(workerID string, responseChanel chan string) {
+	time.Sleep(1 * time.Second)
+	responseChanel <- (workerID + " Response")
 }
