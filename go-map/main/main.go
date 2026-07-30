@@ -1,142 +1,166 @@
-// package main
-
-// import "fmt"
-
-// func main() {
-// 	a := []int{1, 2, 3}
-// 	b := append(a[:1], 10)
-// 	fmt.Println(b) //1 10
-// 	fmt.Println(a) //1 10 3
-// }
-
 package main
 
-import (
-	"fmt"
-	"strings"
-)
+import "fmt"
 
-func equal(x, y map[string]int) bool {
-	if len(x) != len(y) {
-		return false
+var graph = make(map[string]map[string]bool)
+
+func addEdge(from, to string) {
+	edges := graph[from]
+
+	if edges == nil {
+		edges = make(map[string]bool)
+		graph[from] = edges
 	}
-	for k, xv := range x {
-		yv, ok := y[k]
-		if !ok || yv != xv {
-			return false
-		}
-	}
-	return true
+	edges[to] = true
 }
 
+func hasEdge(from, to string) bool {
+	return graph[from][to]
+}
+
+// var counts = make(map[string]int)
+
+// func key(list []string) string {
+// 	fmt.Printf("data==> %q", list)
+// 	return fmt.Sprintf("%q", list)
+// }
+
+// func add(list []string) {
+// 	fmt.Println("list==>", list)
+// 	counts[key(list)]++
+// }
+
+// func equal(x, y map[string]int) bool {
+// 	fmt.Println("x==>", x)
+// 	fmt.Println("y==>", y)
+// 	if len(x) != len(y) {
+// 		return false
+// 	}
+
+// 	for k, value := range x {
+// 		fmt.Println("key==>", k)
+// 		fmt.Println("value==>", value)
+// 		yv, ok := y[k]
+// 		fmt.Println("ok", ok)
+// 		fmt.Println("yv ", yv)
+// 		if !ok || yv != value {
+// 			return false
+// 		}
+// 	}
+// 	return true
+// }
+
 func main() {
+	//create map
+	// a := make(map[string]int)
+	// b := map[string]int{"best": 21}
+	// a["bob"] = 23
+	// fmt.Println(a)
+	// fmt.Println(b)
+	//==================================//
+	//insert update delete key
+	// ages := map[string]int{"bob": 3}
 
-	counts := make(map[string]int)
+	// ages["bob"] = 2
+	// ages["Best"] = 5
+	// delete(ages, "bob")
+	// fmt.Println(ages)
+	//==================================//
+	//Missing Key and Zero Value
 
-	for _, word := range strings.Fields("go is simple and go is fase") {
-		counts[word]++
-	}
+	// ages := make(map[string]int)
+	// ages["bob"]++
+	// ages["bob"]++
 
-	fmt.Println(counts["go"])
-	fmt.Println(counts["is"])
+	// fmt.Println(ages["bob"])
+	// fmt.Println(ages["alice"])
+	//==================================//
+	//check value,ok in map
+	// ages := map[string]int{"best": 21}
+	// age, ok := ages["best"]
 
-	// seen := make(map[string]bool)
+	// fmt.Println(age, ok)
 
-	// for _, value := range []string{"go", "rust", "go", "java"} {
-	// 	if !seen[value] { //เคยเจอ go rust  แล้วยัง ถ้ายังทำต่อ
-	// 		seen[value] = true
-	// 		fmt.Println(seen[value])
-	// 		fmt.Println(value)
-	// 	}
-	// }
+	// ageNotFound, ok := ages["nobody"]
+	// fmt.Println(ageNotFound, ok)
+	//==================================//
+	// Nil Map
+	// var ages map[string]int
 
-	// a := map[string]int{"A": 0}
-	// b := map[string]int{"A": 0}
-	// c := map[string]int{"B": 0}
+	// fmt.Println(ages == nil)
+	// fmt.Println(ages["bob"])
+	// fmt.Println(ages)
+	// delete(ages, "bob")
 
-	// fmt.Println(equal(a, b))
-	// fmt.Println(equal(a, c))
-
-	// ages := map[string]int{"bob": 25}
-	// _ = &ages["bob"]
-
+	// ages = make(map[string]int)
+	// ages["bob"] = 25
+	// fmt.Println(ages)
+	//==================================//
+	//Range ไม่เรียงลำดับ
+	//==================================//
 	// ages := map[string]int{
-	// 	"charlie": 34,
-	// 	"alice":   31,
-	// 	"bob":     25,
+	// 	"chalie": 34,
+	// 	"alice":  31,
+	// 	"bob":    25,
 	// }
 
 	// names := make([]string, 0, len(ages))
+
 	// for name := range ages {
 	// 	names = append(names, name)
 	// }
 
 	// sort.Strings(names)
-
 	// for _, name := range names {
 	// 	fmt.Println(name, ages[name])
 	// }
+	//==================================//
 
-	// ages := make(map[string]int)
-	// ages["bob"] = 25
-	// fmt.Println(ages == nil)
-	// fmt.Println(ages["bob"])
-	// fmt.Println(len(ages))
-	// delete(ages, "bob")
-	// ages = make(map[string]int)
+	// compaire map
+	// a := map[string]int{"A": 0}
+	// b := map[string]int{"A": 0}
+	// c := map[string]int{"B": 0}
 
-	// fmt.Println(ages)
+	// fmt.Println(maps.Equal(a, b))
+	// fmt.Println(equal(a, c))
 
-	// ages := map[string]int{"baby": 0}
+	//==================================//
 
-	// age, ok := ages["baby"]
-	// test, oktest := ages["test"]
-	// fmt.Println(age, ok)
-	// fmt.Println(test, oktest)
+	// map is set
+	// seen := make(map[string]bool)
 
-	// ages := make(map[string]int)
-	// ages["bob"]++
-	// ages["bob"]--
+	// for _, value := range []string{"go", "rust", "go", "java"} {
+	// 	if !seen[value] {
+	// 		seen[value] = true
+	// 		fmt.Println(value)
+	// 	}
 
-	// fmt.Println(ages["bob"])
-	// fmt.Println(ages["alice"])
-	// a := make(map[string]int)
-	// a["alice"] = 31
+	// }
 
-	// b := map[string]int{"bob": 25}
+	//==================================//
 
-	// fmt.Println(a)
-	// fmt.Println(b)
+	// count map
 
-	// ages := map[string]int{"bob": 25}
-	// ages["bob"] = 26
-	// ages["alice"] = 31
-	// fmt.Println("Ages", ages)
+	// counts := make(map[string]int)
 
-	// delete(ages, "bob")
-	// fmt.Println("Ages2", ages)
+	// for _, word := range strings.Fields("go is simple and go is fase") {
+	// 	counts[word]++
+	// }
+
+	// fmt.Println(counts["go"])
+	// fmt.Println(counts["is"])
+
+	//==================================//
+	//slice not key
+
+	// add([]string{"go", "map"})
+	// // add([]string{"go", "map"})
+	// fmt.Println(counts[key([]string{"go", "map"})])
+	//==================================//
+	//Nested Map is Graph
+	addEdge("A", "B")
+	addEdge("A", "C")
+
+	fmt.Println(hasEdge("A", "B"))
+	fmt.Println(hasEdge("A", "D"))
 }
-
-// func countDuplicates(s string) map[rune]int {
-// 	frequency := make(map[rune]int)
-
-// 	for _, ch := range s {
-// 		frequency[ch]++
-// 		fmt.Println("frequency", frequency)
-// 	}
-
-// 	duplicates := make(map[rune]int)
-
-// 	for ch, count := range frequency {
-// 		if count > 1 {
-// 			duplicates[ch] = count
-// 		}
-// 	}
-
-// 	return duplicates
-// }
-
-// func main() {
-// 	result := countDuplicates("programming")
-// 	fmt.Println("result", result)
-// }
