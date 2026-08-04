@@ -1,0 +1,49 @@
+apiVersion: apps/v1 # ระบุเวอร์ชันของ Kubernetes API ที่ใช้กับ resource ประเภท Deployment
+kind: Deployment # ประกาศว่า resource นี้เป็น Deployment (จัดการ Pod หลายตัวพร้อม rollout/update)
+metadata: # ส่วน metadata เก็บข้อมูลระบุตัวตนของ Deployment
+  name: redis # ชื่อของ Deployment ใน cluster
+  namespace: basic-redis # namespace ที่ Deployment นี้จะถูกสร้างและทำงาน
+  labels: # ป้ายกำกับ (labels) สำหรับจัดกลุ่มและค้นหา resource
+    name: redis # label คู่ key-value ใช้ระบุว่า resource นี้คือ redis
+spec: # ส่วน spec กำหนดพฤติกรรมและค่าที่ต้องการของ Deployment
+  replicas: 1 # จำนวน Pod ที่ต้องการให้รันพร้อมกัน (1 ตัว)
+  strategy: # กลยุทธ์การอัปเดต Pod เมื่อมีการเปลี่ยนแปลง spec
+    type: Recreate # หยุด Pod เก่าทั้งหมดก่อน แล้วค่อยสร้าง Pod ใหม่ (เหมาะกับ stateful เช่น Redis)
+  selector: # ใช้เลือก Pod ที่ Deployment นี้จัดการ
+    matchLabels: # เลือก Pod ที่มี labels ตรงกับที่กำหนด
+      name: redis # Pod ต้องมี label name=redis จึงจะถูกจัดการโดย Deployment นี้
+  template: # template ของ Pod ที่ Deployment จะสร้าง
+    metadata: # metadata ของ Pod ที่จะถูกสร้าง
+      labels: # labels ที่ติดกับ Pod แต่ละตัว
+        name: redis # label นี้ต้องตรงกับ selector ด้านบน
+    spec: # spec ของ Pod (กำหนด container และการตั้งค่าภายใน Pod)
+      containers: # รายการ container ที่รันใน Pod นี้
+        - name: redis # ชื่อของ container ภายใน Pod
+          image: 3dsinteractive/redis:5.0 # Docker image ของ Redis เวอร์ชัน 5.0 ที่จะใช้รัน
+          imagePullPolicy: Always # ดึง image จาก registry ทุกครั้งที่สร้าง Pod (ไม่ใช้ cache บน node)
+          ports: # พอร์ตที่ container เปิดรับการเชื่อมต่อ
+            - name: redis6379 # ชื่ออ้างอิงพอร์ต (ใช้ใน probe/service ได้)
+              containerPort: 6379 # พอร์ตมาตรฐานของ Redis ภายใน container
+          env: # ตัวแปรสภาพแวดล้อม (environment variables) ส่งเข้า container
+            - name: ALLOW_EMPTY_PASSWORD # ชื่อ env var สำหรับ image นี้
+              value: "yes" # อนุญาตให้ Redis รันได้โดยไม่ตั้งรหัสผ่าน (เหมาะสำหรับ dev/demo เท่านั้น)
+          resources: # กำหนด CPU และ memory ที่ Pod ขอใช้และใช้ได้สูงสุด
+            requests: # ทรัพยากรขั้นต่ำที่ scheduler ต้องจัดให้ Pod ก่อนรัน
+              memory: 500Mi # ขอ memory อย่างน้อย 500 mebibytes
+              cpu: 200m # ขอ CPU อย่างน้อย 200 millicores (0.2 core)
+            limits: # ขีดจำกัดสูงสุดที่ Pod ใช้ได้ เกิน memory limit อาจถูก OOM kill
+              memory: 1Gi # ใช้ memory ได้สูงสุด 1 gibibyte
+              cpu: 500m # ใช้ CPU ได้สูงสุด 500 millicores (0.5 core)
+          livenessProbe: # ตรวจว่า container ยังมีชีวิตอยู่ ถ้าล้มเหลว Kubernetes จะ restart container
+            tcpSocket: # ตรวจโดยพยายามเปิด TCP connection
+              port: 6379 # ต่อที่พอร์ต Redis 6379
+            initialDelaySeconds: 30 # รอ 30 วินาทีหลัง container เริ่มก่อนตรวจครั้งแรก
+            timeoutSeconds: 1 # ถ้า probe ไม่ตอบภายใน 1 วินาที ถือว่าล้มเหลว
+            periodSeconds: 300 # ตรวจ liveness ทุก 300 วินาที (5 นาที)
+          readinessProbe: # ตรวจว่า container พร้อมรับ traffic หรือยัง ถ้าไม่พร้อมจะถูกตัดออกจาก Service
+            tcpSocket: # ตรวจโดยพยายามเปิด TCP connection
+              port: 6379 # ต่อที่พอร์ต Redis 6379
+            initialDelaySeconds: 30 # รอ 30 วินาทีหลัง container เริ่มก่อนตรวจครั้งแรก
+            timeoutSeconds: 1 # ถ้า probe ไม่ตอบภายใน 1 วินาที ถือว่าล้มเหลว
+            periodSeconds: 30 # ตรวจ readiness ทุก 30 วินาที
+            failureThreshold: 5 # ล้มเหลวติดต่อกัน 5 ครั้งจึงถือว่า Pod ไม่พร้อม
