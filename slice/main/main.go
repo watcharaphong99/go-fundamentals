@@ -53,10 +53,90 @@ func main() {
 
 	// fmt.Println("x", x)
 	// fmt.Println("y", y)
-	values := []int{1, 2, 3}
-	chageFirst(values)
-	fmt.Println(values)
+	// values := []int{1, 2, 3}
+	// chageFirst(values)
+	// fmt.Println(values)
 
+	//make สร้าง underlying array และคือ slice ที่มี len/cap ตามกำหนด
+	// a := make([]int, 3)
+	// b := make([]int, 3, 6)
+
+	// fmt.Println(a, len(a), cap(a))
+	// fmt.Println(b, len(b), cap(b))
+
+	//===========================
+	// x := make([]int, 3, 5)
+	// copy(x, []int{1, 2, 3})
+
+	// y := append(x, 100)
+	// y[0] = 999
+
+	// fmt.Println("x:", x)
+	// fmt.Println("y:", y)
+
+	//output x: [999 2 3] y: [999 2 3 100]
+	//ห้ามเดาว่า append จะ share หร้ือแยก ให้คู่ิดเสมอว่า append อาจคู่ืน Slice ใหมื่
+
+	/////////////////////////////////////////////////
+	// สำคัญมาก function ถ้ามีการใช้ slice ต้อง return เสมอ
+	//append ไม่ได้แก้ slice เดิมโดยตรง แต่ คืน slice ใหม่ — ถ้าไม่รับค่ากลับ caller จะไม่เห็นผล
+
+	// values := []int{1, 2, 3}
+
+	// addWrong(values, 4)
+	// fmt.Println("wrong:", values)
+
+	// values = addRight(values, 4)
+	// fmt.Println("right", values)
+
+	//// 1) return slice ใหม่ (นิยมที่สุด)
+	// func addRight(s []int, v int) []int {
+	//     return append(s, v)
+	// }
+
+	// // 2) รับ pointer to slice
+	// func addWithPointer(s *[]int, v int) {
+	//     *s = append(*s, v)
+	// }
+
+	// // 3) pre-allocate แล้ว return
+	// func build() []int {
+	//     s := make([]int, 0, 100)
+	//     // ...
+	//     return s
+	// }
+	/////////////////////////////////////////////////
+
+	//ทั้งคูู่่ len=0 แตั่ nilSlice ไมื่มืี underlyingarray สื่วน emptySlice เป็นคู่่าที่ไมื่ nil
+	// var a []int
+	// b := []int{}
+
+	// fmt.Println(len(a), a == nil)
+	// fmt.Println(len(b), b == nil)
+
+	// b = append(b, 1)
+	// fmt.Println(b)
+
+	///////////////////////
+	// Slice เหมาะกับ algorithm ที่แก้ underlyingarray โดยไมื่ allocateใหม่
+
+	values := []int{1, 2, 3, 4, 5}
+	reverse(values)
+	fmt.Println(values)
+}
+
+func reverse(s []int) {
+	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+		s[i], s[j] = s[j], s[i]
+	}
+}
+
+func addWrong(s []int, value int) {
+	s = append(s, value)
+}
+
+func addRight(s []int, value int) []int {
+	return append(s, value)
 }
 
 func chageFirst(s []int) {
