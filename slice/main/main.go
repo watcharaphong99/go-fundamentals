@@ -120,9 +120,40 @@ func main() {
 	///////////////////////
 	// Slice เหมาะกับ algorithm ที่แก้ underlyingarray โดยไมื่ allocateใหม่
 
-	values := []int{1, 2, 3, 4, 5}
-	reverse(values)
-	fmt.Println(values)
+	// values := []int{1, 2, 3, 4, 5}
+	// reverse(values)
+	// fmt.Println(values)
+
+	// values := []int{1, 0, 2, 0, 3, 4, 5, 0}
+	// result := noneZero(values)
+	// fmt.Println(result)
+
+	a := []int{5, 6, 7, 8, 9}
+	b := []int{5, 6, 7, 8, 9}
+	fmt.Println(removeOrdered(a, 2))
+	fmt.Println(removeFast(b, 2))
+
+}
+
+func removeOrdered(s []int, i int) []int {
+	copy(s[i:], s[i+1:])
+	return s[:len(s)-1]
+}
+
+func removeFast(s []int, i int) []int {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
+}
+
+func noneZero(values []int) []int {
+	out := values[:0]
+
+	for _, v := range values {
+		if v != 0 {
+			out = append(out, v)
+		}
+	}
+	return out
 }
 
 func reverse(s []int) {
