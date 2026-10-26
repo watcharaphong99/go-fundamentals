@@ -2,66 +2,43 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
 func main() {
-	workerCout := 10
 
-	// 1. Use channel to receive data from go routine
-	//    Send data from go routine back to main
+	fmt.Println("start main()")
 
-	responseChanel := make(chan string)
+	go printStart()
+	go printA2F()
 
-	for i := 0; i < workerCout; i++ {
-		workerID := fmt.Sprintf("worker-%d", i)
-		go worker1(workerID, responseChanel)
-	}
+	time.Sleep(50 * time.Millisecond)
 
-	for i := 0; i < workerCout; i++ {
-		res := <-responseChanel
-		println(res)
-	}
-
-	close(responseChanel)
-	println("All response returned")
-
-	// 2. Use channel to signal go module to exit
-	//    Send data from outside go model into module
-
-	exitChanel := make(chan bool)
-	for i := 0; i < workerCout; i++ {
-		workerID := fmt.Sprintf("worker-%d", i)
-		go worker3(workerID, exitChanel)
-	}
-
-	time.Sleep(10 * time.Second)
-	for i := 0; i < workerCout; i++ {
-		exitChanel <- true
-	}
-	close(exitChanel)
-	time.Sleep(2 * time.Second)
-	println("Main is exited")
+	fmt.Print("สิ้นสุด main() \n\n")
 }
 
-func worker3(workerID string, exitChanel chan bool) {
-	i := 0
-	for true {
-		i++
+func printA2F() {
+	fmt.Println("เริ่มต้น printA2F()")
 
-		select {
-		case <-exitChanel:
-			println(fmt.Sprintf("workerID=%s has exited", workerID))
-			return
-		default:
-			println(fmt.Sprintf("Worker=%s, Counter=%d", workerID, i))
-			time.Sleep(1 * time.Second)
-		}
+	a := 'A'
+	f := a + 5
 
+	for i := a; i <= f; i++ {
+		time.Sleep(800 * time.Microsecond)
+		fmt.Println(string(i))
 	}
+
+	fmt.Println("สิ้ยสุด printA2F")
 }
 
-func worker1(workerID string, responseChanel chan string) {
-	time.Sleep(1 * time.Second)
-	responseChanel <- (workerID + " Response")
+func printStart() {
+	fmt.Println("เริ่มต้น printStart()")
+
+	for i := 1; i <= 5; i++ {
+		time.Sleep(900 * time.Microsecond)
+		fmt.Println(strings.Repeat("*", i))
+	}
+
+	fmt.Print("ิส้นสุด printStat()")
 }

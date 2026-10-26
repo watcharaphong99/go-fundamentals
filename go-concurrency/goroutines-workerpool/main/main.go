@@ -14,7 +14,7 @@ func main() {
 
 	var wg sync.WaitGroup
 
-	// 1) spawn คนงาน "ก่อน" — ยืนรอที่ท่อพร้อมหยิบ
+	// 1) spawn สร้างคนงาน "ก่อน" — ยืนรอที่ท่อพร้อมหยิบ
 	for range 3 {
 		wg.Add(1)
 		go func() {
